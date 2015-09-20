@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{855B7D3D-15B5-4967-89DC-2EEE31CDA363}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{297B6780-3AD3-406E-8FA3-78712C8E5196}"
+	ProjectSection(SolutionItems) = preProject
+		SolutionItems\SolutionInfo.cs = SolutionItems\SolutionInfo.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lx.Web.Twitter.Console", "Lx.Web.Twitter\Lx.Web.Twitter.Console\Lx.Web.Twitter.Console.csproj", "{B7BFEFA0-C3BF-44DE-AFF0-DCE90567FDE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lx.Web.Twitter.Tests", "Lx.Web.Twitter\Lx.Web.Twitter.Tests\Lx.Web.Twitter.Tests.csproj", "{C3C8010F-5349-4852-B560-D9042B6A0D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lx.Db.Protobuf", "Lx.Db.Protobuf\Lx.Db.Protobuf.csproj", "{8E074BD3-E6AA-4EF5-8ECD-F03CC1FC1741}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B7BFEFA0-C3BF-44DE-AFF0-DCE90567FDE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7BFEFA0-C3BF-44DE-AFF0-DCE90567FDE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7BFEFA0-C3BF-44DE-AFF0-DCE90567FDE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7BFEFA0-C3BF-44DE-AFF0-DCE90567FDE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C8010F-5349-4852-B560-D9042B6A0D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C8010F-5349-4852-B560-D9042B6A0D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C8010F-5349-4852-B560-D9042B6A0D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C8010F-5349-4852-B560-D9042B6A0D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E074BD3-E6AA-4EF5-8ECD-F03CC1FC1741}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E074BD3-E6AA-4EF5-8ECD-F03CC1FC1741}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E074BD3-E6AA-4EF5-8ECD-F03CC1FC1741}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E074BD3-E6AA-4EF5-8ECD-F03CC1FC1741}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

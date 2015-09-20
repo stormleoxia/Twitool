@@ -1,0 +1,8 @@
+/Lx.Db.Protobuf/bin
+/Lx.Db.Protobuf/obj
+/Lx.Web.Twitter/Lx.Web.Twitter.Console/bin
+/Lx.Web.Twitter/Lx.Web.Twitter.Console/obj
+/Lx.Web.Twitter/Lx.Web.Twitter.Tests/obj
+/Lx.Web.Twitter/Lx.Web.Twitter.Tests/bin
+/packages
+/*.suo
