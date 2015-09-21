@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Tweetinvi;
+using Tweetinvi.Core;
 using Tweetinvi.Core.Credentials;
 using Tweetinvi.Core.Interfaces;
 
@@ -25,6 +27,9 @@ namespace Lx.Web.Twitter.Console
 
         public void Run(string[] args)
         {
+            // Use Auto limiter 
+            RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
+
             var credentials = RetrieveCredentials();
             var connection = Login(credentials);
             var friends = GetPotentialFriends(connection, 100);

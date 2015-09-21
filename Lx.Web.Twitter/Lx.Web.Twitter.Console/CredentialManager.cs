@@ -38,7 +38,13 @@ namespace Lx.Web.Twitter.Console
 
         private bool TryGetCredentials(out ITwitterCredentials credentials)
         {
-            credentials = new TwitterCredentials();
+            credentials = new TwitterCredentials
+            {
+                ConsumerKey = "",
+                ConsumerSecret = "",
+                AuthorizationKey = "",
+                AuthorizationSecret = "",
+            };
             var appPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var credentialFileName = Path.Combine(appPath, CredentialBase);
 /*            if (!_fileSystem.FileExists(credentialFileName))
