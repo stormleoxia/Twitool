@@ -44,8 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbPoc.cs" />
-    <Compile Include="PerformanceTest.cs" />
+    <Compile Include="Db\DbPoc.cs" />
+    <Compile Include="Db\PerformanceTest.cs" />
+    <Compile Include="Db\ProtoPoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +58,9 @@
       <Project>{8e074bd3-e6aa-4ef5-8ecd-f03cc1fc1741}</Project>
       <Name>Lx.Db.Protobuf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Credentials\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
