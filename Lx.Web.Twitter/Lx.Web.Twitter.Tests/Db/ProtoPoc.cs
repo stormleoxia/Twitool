@@ -15,7 +15,7 @@ namespace Lx.Web.Twitter.Tests.Db
         {
             var model = TypeModel.Create();
             AddProperties(model, typeof(MyPoco));
-            Console.WriteLine(model.GetSchema(typeof(MyPoco)));
+            System.Console.WriteLine(model.GetSchema(typeof(MyPoco)));
 
             var instance = new MyPoco
             {

@@ -114,10 +114,16 @@
     <Compile Include="..\..\SolutionItems\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ConsoleWrapper.cs" />
     <Compile Include="CredentialManager.cs" />
+    <Compile Include="CredentialTwitterFacade.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="FriendConnector.cs" />
     <Compile Include="FriendFinder.cs" />
+    <Compile Include="IConsole.cs" />
     <Compile Include="ICredentialManager.cs" />
+    <Compile Include="ICredentialTwitterFacade.cs" />
+    <Compile Include="IFileSystem.cs" />
     <Compile Include="IFriendConnector.cs" />
     <Compile Include="IFriendFinder.cs" />
     <Compile Include="ILoginManager.cs" />

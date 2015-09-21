@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Lx.Db.Protobuf;
 using NUnit.Framework;
 
-namespace Lx.Web.Twitter.Tests
+namespace Lx.Web.Twitter.Tests.Db
 {
     [TestFixture]
     public class DbPerformanceTest
@@ -30,7 +29,7 @@ namespace Lx.Web.Twitter.Tests
                 }
             }
             watch.Stop();
-            Console.WriteLine("Elapsed: " + watch.Elapsed);
+            System.Console.WriteLine("Elapsed: " + watch.Elapsed);
         }
     }
 }

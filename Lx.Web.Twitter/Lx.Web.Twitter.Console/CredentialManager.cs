@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ProtoBuf;
 using Tweetinvi;
 using Tweetinvi.Core.Credentials;
 
@@ -8,13 +9,14 @@ namespace Lx.Web.Twitter.Console
     public class CredentialManager : ICredentialManager
     {
         private readonly IFileSystem _fileSystem;
-        private readonly IConsole _console;
+        private readonly ICredentialTwitterFacade _credentialTwitterFacade;
+        private static string _credentialFileName;
         private const string CredentialBase = "Lx.Twitter/credentials";
 
-        public CredentialManager(IFileSystem fileSystem, IConsole console)
+        public CredentialManager(IFileSystem fileSystem, ICredentialTwitterFacade credentialTwitterFacade)
         {
             _fileSystem = fileSystem;
-            _console = console;
+            _credentialTwitterFacade = credentialTwitterFacade;
         }
 
         /// <summary>
@@ -24,21 +26,39 @@ namespace Lx.Web.Twitter.Console
         /// <returns></returns>
         public ITwitterCredentials RetrieveCredentials()
         {
-            ITwitterCredentials credentials;
-            var credentialsRetrieved = TryGetStoredCredentialsOnLocalMachine(out credentials);
+            ITwitterCredentials credentials = null;
+            var areCredentialsStored = AreCredentialsStored();
+            var credentialsRetrieved = false;
+            if (areCredentialsStored)
+            {
+                credentialsRetrieved = TryGetStoredCredentialsOnLocalMachine(out credentials);
+            }
             while (!credentialsRetrieved) // No Credentials on local machine, ask for them
             {
                 credentials = AskForCredentials();
                 credentialsRetrieved = ValidateCredentials(credentials);
             }
-            StoreCredentialsOnLocalMachine(credentials);
-            Auth.SetUserCredentials(credentials.ConsumerKey, credentials.ConsumerSecret, credentials.AuthorizationKey, credentials.AuthorizationSecret);
+            if (!areCredentialsStored)
+            {
+                StoreCredentialsOnLocalMachine(credentials);
+            }
+            _credentialTwitterFacade.SetUserCredentials(credentials);
             return credentials;
         }
 
         private void StoreCredentialsOnLocalMachine(ITwitterCredentials credentials)
         {
-            
+            var serializable = new SerializedCredentials
+            {
+                AuthorizationKey = credentials.AuthorizationKey,
+                AuthorizationSecret = credentials.AuthorizationSecret,
+                ConsumerKey = credentials.ConsumerKey,
+                ConsumerSecret = credentials.ConsumerSecret
+            };
+            using (var reader = _fileSystem.Open(CredentialFileName, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                Serializer.Serialize(reader.Stream, serializable);
+            }
         }
 
         private bool ValidateCredentials(ITwitterCredentials credentials)
@@ -48,51 +68,44 @@ namespace Lx.Web.Twitter.Console
 
         private ITwitterCredentials AskForCredentials()
         {
-            var applicationCredentials = new ConsumerCredentials("consumer_key", "consumer_secret");
-            var url = CredentialsCreator.GetAuthorizationURL(applicationCredentials);
-            _console.WriteLine("Navigate to : {0}", url);
-            _console.WriteLine("Enter the captcha: ");
-            var captcha = _console.ReadLine();
-            var newCredentials = CredentialsCreator.GetCredentialsFromVerifierCode(captcha, applicationCredentials);
-            if (newCredentials == null)
-            {
-                _console.Error.WriteLine("Bad captcha");
-            }
-            else
-            {
-                _console.WriteLine("Access Token = {0}", newCredentials.AccessToken);
-                _console.WriteLine("Access Token Secret = {0}", newCredentials.AccessTokenSecret);
-            }
+            var newCredentials = _credentialTwitterFacade.AskForTwitterCredentials();
             return newCredentials;
         }
 
         private bool TryGetStoredCredentialsOnLocalMachine(out ITwitterCredentials credentials)
         {
             credentials = null;
-            var appPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var credentialFileName = Path.Combine(appPath, CredentialBase);
-            if (!_fileSystem.FileExists(credentialFileName))
+            using (var reader = _fileSystem.Open(CredentialFileName, FileMode.Open, FileAccess.Read))
             {
-                return false;
-            }
-            using (var reader = _fileSystem.Open(credentialFileName))
-            {
-                
+                var cred = Serializer.Deserialize<SerializedCredentials>(reader.Stream);
+                if (cred != null)
+                {
+                    credentials = new TwitterCredentials(cred.ConsumerKey, cred.ConsumerSecret);
+                    credentials.AuthorizationKey = cred.AuthorizationKey;
+                    credentials.AuthorizationSecret = cred.AuthorizationSecret;
+                    return true;
+                }
             }
             return false;
         }
-    }
 
-    public interface IFileSystem
-    {
-        bool FileExists(string filePath);
-        IDisposable Open(string filePath);
-    }
+        private bool AreCredentialsStored()
+        {
+            var credentialFileName = CredentialFileName;
+            return _fileSystem.FileExists(credentialFileName);
+        }
 
-    public interface IConsole
-    {
-        void WriteLine(string format, params object[] parameters);
-        string ReadLine();
-        IConsole Error { get; }
+        private static string CredentialFileName
+        {
+            get
+            {
+                if (_credentialFileName == null)
+                {
+                    var appPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    _credentialFileName = Path.Combine(appPath, CredentialBase);
+                }
+                return _credentialFileName;
+            }
+        }
     }
 }

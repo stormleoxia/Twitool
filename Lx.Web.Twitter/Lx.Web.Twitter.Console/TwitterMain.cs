@@ -27,11 +27,11 @@ namespace Lx.Web.Twitter.Console
 
         public void Run(string[] args)
         {
-            // Use Auto limiter 
-            RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
-
             var credentials = RetrieveCredentials();
             var connection = Login(credentials);
+            // Use Auto limiter after connection (otherwise it will crash:
+            // => Attempt to retrieve a Rate limit for null key)
+            RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
             var friends = GetPotentialFriends(connection, 100);
             BefriendWith(connection, friends);     
         }
