@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Lx.Web.Twitter.Console
 {
@@ -11,6 +12,21 @@ namespace Lx.Web.Twitter.Console
 
         public IFileStream Open(string filePath, FileMode mode, FileAccess access)
         {
+            switch (mode)
+            {
+                case FileMode.CreateNew:
+                case FileMode.Create:
+                case FileMode.OpenOrCreate:
+                case FileMode.Append:
+                {
+                    var directory = Path.GetDirectoryName(filePath);
+                    if (directory != null && !Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+                    break;
+                }
+            }
             return new FileStreamWrapper(File.Open(filePath, mode, access));
         }
     }

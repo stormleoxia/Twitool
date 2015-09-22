@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using ProtoBuf;
-using Tweetinvi;
 using Tweetinvi.Core.Credentials;
 
-namespace Lx.Web.Twitter.Console
+namespace Lx.Web.Twitter.Console.Authentication
 {
     public class CredentialManager : ICredentialManager
     {
@@ -50,10 +49,10 @@ namespace Lx.Web.Twitter.Console
         {
             var serializable = new SerializedCredentials
             {
-                AuthorizationKey = credentials.AuthorizationKey,
-                AuthorizationSecret = credentials.AuthorizationSecret,
                 ConsumerKey = credentials.ConsumerKey,
-                ConsumerSecret = credentials.ConsumerSecret
+                ConsumerSecret = credentials.ConsumerSecret,
+                AccessToken = credentials.AccessToken,
+                AccessTokenSecret = credentials.AccessTokenSecret
             };
             using (var reader = _fileSystem.Open(CredentialFileName, FileMode.OpenOrCreate, FileAccess.Write))
             {
@@ -81,8 +80,8 @@ namespace Lx.Web.Twitter.Console
                 if (cred != null)
                 {
                     credentials = new TwitterCredentials(cred.ConsumerKey, cred.ConsumerSecret);
-                    credentials.AuthorizationKey = cred.AuthorizationKey;
-                    credentials.AuthorizationSecret = cred.AuthorizationSecret;
+                    credentials.AccessToken = cred.AccessToken;
+                    credentials.AccessTokenSecret = cred.AccessTokenSecret;
                     return true;
                 }
             }

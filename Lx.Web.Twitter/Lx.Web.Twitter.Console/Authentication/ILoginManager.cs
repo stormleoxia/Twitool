@@ -1,7 +1,7 @@
 ﻿using Tweetinvi.Core.Credentials;
 using Tweetinvi.Core.Interfaces;
 
-namespace Lx.Web.Twitter.Console
+namespace Lx.Web.Twitter.Console.Authentication
 {
     public interface ILoginManager
     {

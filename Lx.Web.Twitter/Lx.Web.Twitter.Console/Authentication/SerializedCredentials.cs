@@ -13,10 +13,10 @@ namespace Lx.Web.Twitter.Console
         public string ConsumerSecret { get; set; }
 
         [ProtoMember(3)]
-        public string AuthorizationKey { get; set; }
+        public string AccessToken { get; set; }
 
         [ProtoMember(4)]
-        public string AuthorizationSecret { get; set; }
+        public string AccessTokenSecret { get; set; }
 
     }
 }

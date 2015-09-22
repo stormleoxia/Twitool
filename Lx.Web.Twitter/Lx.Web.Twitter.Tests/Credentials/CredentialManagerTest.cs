@@ -2,6 +2,7 @@
 using System.IO;
 using Autofac.Extras.Moq;
 using Lx.Web.Twitter.Console;
+using Lx.Web.Twitter.Console.Authentication;
 using Moq;
 using NUnit.Framework;
 using Tweetinvi.Core.Credentials;

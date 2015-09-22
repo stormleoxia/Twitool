@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Tweetinvi;
 using Tweetinvi.Core.Interfaces;
 
 namespace Lx.Web.Twitter.Console
@@ -16,7 +17,9 @@ namespace Lx.Web.Twitter.Console
         {
             foreach (var friend in friends)
             {
-                user.FollowUser(friend);
+                var localFriend = friend;
+                Auth.ExecuteOperationWithCredentials(user.Credentials, () => 
+                user.FollowUser(localFriend));
                 _cache.FlagAsFollowed(friend);
             }
         }

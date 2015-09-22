@@ -114,23 +114,27 @@
     <Compile Include="..\..\SolutionItems\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ConsoleWrapper.cs" />
-    <Compile Include="CredentialManager.cs" />
-    <Compile Include="CredentialTwitterFacade.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="FriendConnector.cs" />
-    <Compile Include="FriendFinder.cs" />
-    <Compile Include="IConsole.cs" />
-    <Compile Include="ICredentialManager.cs" />
-    <Compile Include="ICredentialTwitterFacade.cs" />
-    <Compile Include="IFileSystem.cs" />
-    <Compile Include="IFriendConnector.cs" />
-    <Compile Include="IFriendFinder.cs" />
-    <Compile Include="ILoginManager.cs" />
-    <Compile Include="LoginManager.cs" />
+    <Compile Include="Wrappers\ConsoleWrapper.cs" />
+    <Compile Include="Authentication\CredentialManager.cs" />
+    <Compile Include="Authentication\CredentialTwitterFacade.cs" />
+    <Compile Include="Wrappers\FileSystem.cs" />
+    <Compile Include="Followers\FollowerCache.cs" />
+    <Compile Include="Followers\FollowersTracker.cs" />
+    <Compile Include="Followers\FollowerTracker.cs" />
+    <Compile Include="Followers\FriendConnector.cs" />
+    <Compile Include="Followers\FriendFinder.cs" />
+    <Compile Include="Wrappers\IConsole.cs" />
+    <Compile Include="Authentication\ICredentialManager.cs" />
+    <Compile Include="Authentication\ICredentialTwitterFacade.cs" />
+    <Compile Include="Wrappers\IFileSystem.cs" />
+    <Compile Include="Followers\IFollowerCache.cs" />
+    <Compile Include="Followers\IFriendConnector.cs" />
+    <Compile Include="Followers\IFriendFinder.cs" />
+    <Compile Include="Authentication\ILoginManager.cs" />
+    <Compile Include="Authentication\LoginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerializedCredentials.cs" />
+    <Compile Include="Authentication\SerializedCredentials.cs" />
     <Compile Include="TwitterMain.cs" />
   </ItemGroup>
   <ItemGroup>
