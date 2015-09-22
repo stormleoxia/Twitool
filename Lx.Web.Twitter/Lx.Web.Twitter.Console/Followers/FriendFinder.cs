@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Runtime.CompilerServices;
+using System.Linq;
 using Tweetinvi;
 using Tweetinvi.Core.Interfaces;
-using Tweetinvi.Factories.User;
 
-namespace Lx.Web.Twitter.Console
+namespace Lx.Web.Twitter.Console.Followers
 {
     internal class FriendFinder : IFriendFinder
     {
@@ -28,15 +27,17 @@ namespace Lx.Web.Twitter.Console
         /// <returns></returns>
         public IEnumerable<long> GetPotentialFriends(ILoggedUser user, int maxFriends)
         {
-            IEnumerable<long> myFollowers = _cache.GetFollowers(user.Id, () => 
-                Auth.ExecuteOperationWithCredentials(user.Credentials, () => user.GetFollowerIds()));
+            _cache.SetUser(user);
+            IEnumerable<long> myFollowers = _cache.GetFollowers(user.Id);
             List<long> list = new List<long>();
             foreach (var follower in myFollowers)
             {
-                var localFollower = follower;
-                var friendFollowers = _cache.GetFollowers(follower, () => 
-                    Auth.ExecuteOperationWithCredentials(user.Credentials, () => User.GetFollowerIds(localFollower)));
+                var friendFollowers = _cache.SelectFollowersNotFollowed(user.Id, follower).ToArray();
                 list.AddRange(friendFollowers);
+                if (friendFollowers.Length > 0)
+                {
+                    break;
+                }
             }
             return list;
         }

@@ -119,8 +119,7 @@
     <Compile Include="Authentication\CredentialTwitterFacade.cs" />
     <Compile Include="Wrappers\FileSystem.cs" />
     <Compile Include="Followers\FollowerCache.cs" />
-    <Compile Include="Followers\FollowersTracker.cs" />
-    <Compile Include="Followers\FollowerTracker.cs" />
+    <Compile Include="Followers\UserTracker.cs" />
     <Compile Include="Followers\FriendConnector.cs" />
     <Compile Include="Followers\FriendFinder.cs" />
     <Compile Include="Wrappers\IConsole.cs" />

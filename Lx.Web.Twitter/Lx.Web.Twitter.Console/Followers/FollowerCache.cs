@@ -2,13 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lx.Db.Protobuf;
+using Tweetinvi;
+using Tweetinvi.Core.Credentials;
+using Tweetinvi.Core.Interfaces;
 
-namespace Lx.Web.Twitter.Console
+namespace Lx.Web.Twitter.Console.Followers
 {
-    internal sealed class FollowerCache : IFollowerCache, IDisposable
+    internal sealed class FollowerCache : IFollowerCache
     {
         private LxDb _database;
         private readonly IDbSession _session;
+        private ILoggedUser _user;
 
         public FollowerCache()
         {
@@ -16,46 +20,79 @@ namespace Lx.Web.Twitter.Console
             _session = _database.OpenSession();
         }
 
-        private List<long> GetValidTrackers(FollowersTracker followerTrackers)
+        public IEnumerable<long> GetFollowers(long id)
         {
-            return followerTrackers.Trackers.Where(x => !x.Followed).Select(x => x.Id).ToList();
+            var userTracker = GetOrLoadUserTracker(id);
+            return userTracker.Subscribers.ToArray();
         }
 
-        public IEnumerable<long> GetFollowers(long id, Func<IEnumerable<long>> load)
+        private UserTracker GetOrLoadUserTracker(long id)
         {
-            var followerTrackers = _session.Get<FollowersTracker>(id);
-            if (followerTrackers == null)
+            var userTracker = _session.Get<UserTracker>(id);
+            if (UserNotLoadedOrTooOld(userTracker))
             {
-                followerTrackers = new FollowersTracker{Id = id};
+                userTracker = LoadAndSaveTracker(id);
             }
-            var valids = GetValidTrackers(followerTrackers);
-            if (valids.Count == 0 || valids.Count < 150)
-            {
-                var newIds = load();
-                foreach (var newId in newIds)
-                {
-                    var tracker = new FollowerTracker {Followed = false, Id = newId};
-                    followerTrackers.Trackers.Add(tracker);
-                }
-                _session.Save(id, followerTrackers);
-                valids = GetValidTrackers(followerTrackers);
-            }
-            return valids;
+            return userTracker;
         }
+
+        /// <summary>
+        /// Check if user is not loaded or loaded but a long time ago (30 days).
+        /// </summary>
+        /// <param name="userTracker">The user tracker.</param>
+        /// <returns></returns>
+        private bool UserNotLoadedOrTooOld(UserTracker userTracker)
+        {
+            return userTracker == null || DateTime.UtcNow - userTracker.LastLoad > TimeSpan.FromDays(30);
+        }
+
+        /// <summary>
+        /// Selects only the followers from follower owner which not followed already by reference user.
+        /// </summary>
+        /// <param name="referenceUserId">The reference user identifier.</param>
+        /// <param name="followerOwnerId">The follower owner identifier.</param>
+        /// <returns></returns>
+        public IEnumerable<long> SelectFollowersNotFollowed(long referenceUserId, long followerOwnerId)
+        {
+            var referenceUder = GetOrLoadUserTracker(referenceUserId);
+            var followerOwner = GetOrLoadUserTracker(followerOwnerId);
+            var hashSet = new HashSet<long>(referenceUder.Subscriptions);
+            return followerOwner.Subscribers.Where(x => !hashSet.Contains(x));
+        }
+
+        private UserTracker LoadAndSaveTracker(long id)
+        {
+            var userTracker = LoadUserTracker(id);
+            _session.Save(id, userTracker);
+            _session.Commit();
+            return userTracker;
+        }
+
+        private UserTracker LoadUserTracker(long id)
+        {
+            var userTracker = new UserTracker {Id = id};
+            userTracker.Subscribers = Secured(() => User.GetFollowerIds(id)).ToList();
+            userTracker.Subscriptions = Secured(() => User.GetFriendIds(id)).ToList();
+            userTracker.LastLoad = DateTime.UtcNow;
+            return userTracker;
+        }
+
+        private T Secured<T>(Func<T> func)
+        {
+            return Auth.ExecuteOperationWithCredentials(_user.Credentials, func);
+        }
+
 
         public void FlagAsFollowed(long userId)
         {
-            var allTracked = _session.GetAll<FollowersTracker>();
-            foreach (var follower in allTracked)
-            {
-                foreach (var tracker in follower.Trackers)
-                {
-                    if (tracker.Id == userId)
-                    {
-                        tracker.Followed = true;
-                    }
-                }
-            }
+            var mainUserTracker = _session.Get<UserTracker>(_user.Id);
+            mainUserTracker.Subscriptions.Add(userId);
+            _session.Save(_user.Id, mainUserTracker);
+        }
+
+        public void SetUser(ILoggedUser user)
+        {
+            _user = user;
         }
 
         public void Dispose()

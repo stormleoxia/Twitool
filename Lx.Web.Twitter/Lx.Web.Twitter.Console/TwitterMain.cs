@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Mime;
 using Lx.Web.Twitter.Console.Authentication;
+using Lx.Web.Twitter.Console.Followers;
 using Tweetinvi;
 using Tweetinvi.Core;
 using Tweetinvi.Core.Credentials;
@@ -18,37 +19,45 @@ namespace Lx.Web.Twitter.Console
         private readonly IFriendFinder _friendFinder;
         private readonly IFriendConnector _friendConnector;
         private readonly IConsole _console;
+        private readonly ITweetConfiguration _configuration;
+        private readonly IFollowerCache _cache;
 
         public TwitterMain(ICredentialManager credManager,
             ILoginManager loginManager,
             IFriendFinder friendFinder,
             IFriendConnector friendConnector,
-            IConsole console)
+            IConsole console,
+            ITweetConfiguration configuration,
+            IFollowerCache cache)
         {
             _credManager = credManager;
             _loginManager = loginManager;
             _friendFinder = friendFinder;
             _friendConnector = friendConnector;
             _console = console;
+            _configuration = configuration;
+            _cache = cache;
         }
 
         public void Run(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-            ExceptionHandler.SwallowWebExceptions = false;
+            _configuration.ConfigureExceptionHandling();
             try
             {
                 var credentials = RetrieveCredentials();
                 var connection = Login(credentials);
-                // Use Auto limiter after connection (otherwise it will crash:
-                // => Attempt to retrieve a Rate limit for null key)
-                RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
+                _configuration.ConfigureRateLimiting();
                 var friends = GetPotentialFriends(connection, 100);
                 BefriendWith(connection, friends);
             }
             catch (Exception e)
             {
-                _console.WriteLine(e.ToString());   
+                _console.WriteLine(e.ToString());
+            }
+            finally
+            {
+                _cache.Dispose();
             }
             if (Debugger.IsAttached)
             {
@@ -83,5 +92,26 @@ namespace Lx.Web.Twitter.Console
             _friendConnector.BefriendWith(user, friends);
         }
 
+    }
+
+    public interface ITweetConfiguration
+    {
+        void ConfigureExceptionHandling();
+        void ConfigureRateLimiting();
+    }
+
+    class TweetConfiguration : ITweetConfiguration
+    {
+        public void ConfigureExceptionHandling()
+        {
+            ExceptionHandler.SwallowWebExceptions = true;
+        }
+
+        public void ConfigureRateLimiting()
+        {
+            // Use Auto limiter after connection (otherwise it will crash:
+            // => Attempt to retrieve a Rate limit for null key)
+            RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
+        }
     }
 }

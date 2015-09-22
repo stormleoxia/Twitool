@@ -10,7 +10,7 @@ namespace Lx.Web.Twitter.Console
             var builder = new ContainerBuilder();
             builder.RegisterType<TwitterMain>();
             builder.RegisterAssemblyTypes(typeof(Program).Assembly)
-                .AsImplementedInterfaces();
+                .AsImplementedInterfaces().SingleInstance();
             Container = builder.Build();
         }
 
