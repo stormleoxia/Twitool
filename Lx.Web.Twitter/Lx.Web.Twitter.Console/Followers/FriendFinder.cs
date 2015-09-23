@@ -34,10 +34,6 @@ namespace Lx.Web.Twitter.Console.Followers
             {
                 var friendFollowers = _cache.SelectFollowersNotFollowed(user.Id, follower).ToArray();
                 list.AddRange(friendFollowers);
-                if (friendFollowers.Length > 0)
-                {
-                    break;
-                }
             }
             return list;
         }
