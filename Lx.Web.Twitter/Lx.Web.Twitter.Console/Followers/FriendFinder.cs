@@ -38,7 +38,7 @@ namespace Lx.Web.Twitter.Console.Followers
                 list.AddRange(friendFollowers);
             }
             _console.WriteLine("Found potential {0} friends", list.Count);
-            return list;
+            return list.Take(maxFriends);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Lx.Web.Twitter.Console.Followers
             _cache.SetUser(user);
             List<long> list = _cache.SelectSubscriptionsNotFollowing(user.Id).ToList();
             _console.WriteLine("Found potential {0} unfriends", list.Count);
-            return list;
+            return list.Take(maxFriends);
         }
  
     }

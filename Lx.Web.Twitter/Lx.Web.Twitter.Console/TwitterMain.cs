@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Net.Mime;
 using Lx.Web.Twitter.Console.Authentication;
 using Lx.Web.Twitter.Console.Followers;
-using Tweetinvi;
-using Tweetinvi.Core;
 using Tweetinvi.Core.Credentials;
 using Tweetinvi.Core.Interfaces;
 
@@ -21,6 +19,7 @@ namespace Lx.Web.Twitter.Console
         private readonly IConsole _console;
         private readonly ITweetConfiguration _configuration;
         private readonly IFollowerCache _cache;
+        private Random _random;
 
         public TwitterMain(ICredentialManager credManager,
             ILoginManager loginManager,
@@ -37,6 +36,7 @@ namespace Lx.Web.Twitter.Console
             _console = console;
             _configuration = configuration;
             _cache = cache;
+            _random = new Random(Environment.TickCount);
         }
 
         public void Run(string[] args)
@@ -48,8 +48,11 @@ namespace Lx.Web.Twitter.Console
                 var credentials = RetrieveCredentials();
                 var connection = Login(credentials);
                 _configuration.ConfigureRateLimiting();
-                var friends = GetPotentialFriends(connection, 100);
+                var unfriends = _friendFinder.GetNotFriends(connection, Randomize(100));
+                _friendConnector.UnFriendWith(connection, unfriends);
+                var friends = GetPotentialFriends(connection, Randomize(100));                
                 BefriendWith(connection, friends);
+
             }
             catch (Exception e)
             {
@@ -64,6 +67,12 @@ namespace Lx.Web.Twitter.Console
                 _console.WriteLine("Press a key to exit...");
                 _console.ReadLine();
             }
+        }
+
+        private int Randomize(int range)
+        {
+            var add = _random.Next(0, 10);
+            return Math.Max(5, range - 5 + add);
         }
 
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -92,26 +101,5 @@ namespace Lx.Web.Twitter.Console
             _friendConnector.BefriendWith(user, friends);
         }
 
-    }
-
-    public interface ITweetConfiguration
-    {
-        void ConfigureExceptionHandling();
-        void ConfigureRateLimiting();
-    }
-
-    class TweetConfiguration : ITweetConfiguration
-    {
-        public void ConfigureExceptionHandling()
-        {
-            ExceptionHandler.SwallowWebExceptions = true;
-        }
-
-        public void ConfigureRateLimiting()
-        {
-            // Use Auto limiter after connection (otherwise it will crash:
-            // => Attempt to retrieve a Rate limit for null key)
-            RateLimit.RateLimitTrackerOption = RateLimitTrackerOptions.TrackAndAwait;
-        }
     }
 }

@@ -56,10 +56,14 @@ namespace Lx.Web.Twitter.Console.Followers
         public IEnumerable<long> SelectFollowersNotFollowed(long referenceUserId, long followerOwnerId)
         {
             var referenceUser = GetOrLoadUserTracker(referenceUserId);
-            var followerOwner = GetOrLoadUserTracker(followerOwnerId);
+            var followerOwner = GetOrLoadUserTracker(followerOwnerId);            
             var subscriptions = new HashSet<long>(referenceUser.Subscriptions);
+            var oldSubscriptions = new HashSet<long>(referenceUser.OldSubscriptions);
             var unsubcriptions = new HashSet<long>(referenceUser.Unsubscribed);
-            return followerOwner.Subscribers.Where(x => !subscriptions.Contains(x) && !unsubcriptions.Contains(x));
+            return followerOwner.Subscribers.Where(
+                x => !subscriptions.Contains(x) && 
+                !unsubcriptions.Contains(x) &&
+                oldSubscriptions.Contains(x));
         }
 
         public IEnumerable<long> SelectSubscriptionsNotFollowing(long userId)
@@ -87,6 +91,7 @@ namespace Lx.Web.Twitter.Console.Followers
             if (oldVersion != null)
             {
                 userTracker.Unsubscribed = oldVersion.Unsubscribed;
+                userTracker.OldSubscriptions.AddRange(oldVersion.Subscriptions);                
             }
             userTracker.LastLoad = DateTime.UtcNow;
             return userTracker;

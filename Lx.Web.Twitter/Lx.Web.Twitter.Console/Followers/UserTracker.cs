@@ -11,6 +11,7 @@ namespace Lx.Web.Twitter.Console.Followers
         {
             Subscribers = new List<long>();
             Subscriptions = new List<long>();
+            Unsubscribed = new List<long>();
         }
 
         /// <summary>
@@ -58,5 +59,14 @@ namespace Lx.Web.Twitter.Console.Followers
         /// </value>
         [ProtoMember(5)]
         public List<long> Unsubscribed { get; set; }
+
+        /// <summary>
+        /// Gets of sets the user which were subscribed once in the user lifetime.
+        /// </summary>
+        /// <value>
+        /// The unsubscribed.
+        /// </value>
+        [ProtoMember(6)]
+        public List<long>  OldSubscriptions { get; set; }
     }
 }
