@@ -114,6 +114,8 @@
     <Compile Include="..\..\SolutionItems\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ITweetConfiguration.cs" />
+    <Compile Include="TweetConfiguration.cs" />
     <Compile Include="Wrappers\ConsoleWrapper.cs" />
     <Compile Include="Authentication\CredentialManager.cs" />
     <Compile Include="Authentication\CredentialTwitterFacade.cs" />

@@ -48,8 +48,8 @@ namespace Lx.Web.Twitter.Console
                 var credentials = RetrieveCredentials();
                 var connection = Login(credentials);
                 _configuration.ConfigureRateLimiting();
-                var unfriends = _friendFinder.GetNotFriends(connection, Randomize(100));
-                _friendConnector.UnFriendWith(connection, unfriends);
+                //var unfriends = _friendFinder.GetNotFriends(connection, Randomize(100));
+                //_friendConnector.UnFriendWith(connection, unfriends);
                 var friends = GetPotentialFriends(connection, Randomize(100));                
                 BefriendWith(connection, friends);
 

@@ -12,6 +12,7 @@ namespace Lx.Web.Twitter.Console.Followers
             Subscribers = new List<long>();
             Subscriptions = new List<long>();
             Unsubscribed = new List<long>();
+            OldSubscriptions = new List<long>();
         }
 
         /// <summary>
