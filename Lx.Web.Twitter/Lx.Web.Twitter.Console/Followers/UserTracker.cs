@@ -49,5 +49,14 @@ namespace Lx.Web.Twitter.Console.Followers
         /// </value>
         [ProtoMember(4)]
         public DateTime LastLoad { get; set; }
+
+        /// <summary>
+        /// Gets of sets the user which were unsubscribed (from subscriptions)
+        /// </summary>
+        /// <value>
+        /// The unsubscribed.
+        /// </value>
+        [ProtoMember(5)]
+        public List<long> Unsubscribed { get; set; }
     }
 }

@@ -19,6 +19,7 @@ namespace Lx.Web.Twitter.Console.Followers
         public void BefriendWith(ILoggedUser user, IEnumerable<long> friends)
         {
             Exception lastException = null;
+            var number = 0;
             foreach (var friend in friends)
             {
                 var localFriend = friend;
@@ -32,11 +33,47 @@ namespace Lx.Web.Twitter.Console.Followers
                     lastException = e;
                 }
                 _cache.FlagAsFollowed(friend);
+                if (number++ % 100 == 0)
+                {
+                    _console.WriteLine("Added {0} friends", number);
+                }
             }
+            _console.WriteLine("Added {0} friends", number);
+            DisplayException(lastException);
+        }
+
+        private void DisplayException(Exception lastException)
+        {
             if (lastException != null)
             {
                 _console.WriteLine(lastException.ToString());
             }
+        }
+
+        public void UnFriendWith(ILoggedUser user, IEnumerable<long> noLongerFriends)
+        {
+            Exception lastException = null;
+            var number = 0;
+            foreach (var friend in noLongerFriends)
+            {
+                var localFriend = friend;
+                try
+                {
+                    Auth.ExecuteOperationWithCredentials(user.Credentials, () =>
+                        user.UnFollowUser(localFriend));
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
+                _cache.FlagAsUnFollowed(friend);
+                if (number++ % 100 == 0)
+                {
+                    _console.WriteLine("Removed {0} friends", number);
+                }
+            }
+            _console.WriteLine("Removed {0} friends", number);
+            DisplayException(lastException);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lx.Db.Protobuf;
 using Tweetinvi;
-using Tweetinvi.Core.Credentials;
 using Tweetinvi.Core.Interfaces;
 
 namespace Lx.Web.Twitter.Console.Followers
@@ -14,10 +13,12 @@ namespace Lx.Web.Twitter.Console.Followers
         private readonly IDbSession _session;
         private ILoggedUser _user;
 
-        public FollowerCache()
+        public FollowerCache(IConsole console)
         {
             _database = new LxDb("local.db");
             _session = _database.OpenSession();
+            var users = _session.GetAll<UserTracker>();
+            console.WriteLine("Users in database: " + users.Count());
         }
 
         public IEnumerable<long> GetFollowers(long id)
@@ -54,10 +55,19 @@ namespace Lx.Web.Twitter.Console.Followers
         /// <returns></returns>
         public IEnumerable<long> SelectFollowersNotFollowed(long referenceUserId, long followerOwnerId)
         {
-            var referenceUder = GetOrLoadUserTracker(referenceUserId);
+            var referenceUser = GetOrLoadUserTracker(referenceUserId);
             var followerOwner = GetOrLoadUserTracker(followerOwnerId);
-            var hashSet = new HashSet<long>(referenceUder.Subscriptions);
-            return followerOwner.Subscribers.Where(x => !hashSet.Contains(x));
+            var subscriptions = new HashSet<long>(referenceUser.Subscriptions);
+            var unsubcriptions = new HashSet<long>(referenceUser.Unsubscribed);
+            return followerOwner.Subscribers.Where(x => !subscriptions.Contains(x) && !unsubcriptions.Contains(x));
+        }
+
+        public IEnumerable<long> SelectSubscriptionsNotFollowing(long userId)
+        {
+            var referenceUser = LoadAndSaveTracker(userId); // Force a up-to-date load
+            var followers = new HashSet<long>(referenceUser.Subscribers);
+            var unsubcriptions = new HashSet<long>(referenceUser.Unsubscribed);
+            return referenceUser.Subscriptions.Where(x => !unsubcriptions.Contains(x) && !followers.Contains(x));
         }
 
         private UserTracker LoadAndSaveTracker(long id)
@@ -73,6 +83,11 @@ namespace Lx.Web.Twitter.Console.Followers
             var userTracker = new UserTracker {Id = id};
             userTracker.Subscribers = Secured(() => User.GetFollowerIds(id)).ToList();
             userTracker.Subscriptions = Secured(() => User.GetFriendIds(id)).ToList();
+            var oldVersion = _session.Get<UserTracker>(id);
+            if (oldVersion != null)
+            {
+                userTracker.Unsubscribed = oldVersion.Unsubscribed;
+            }
             userTracker.LastLoad = DateTime.UtcNow;
             return userTracker;
         }
@@ -93,6 +108,13 @@ namespace Lx.Web.Twitter.Console.Followers
         public void SetUser(ILoggedUser user)
         {
             _user = user;
+        }
+
+        public void FlagAsUnFollowed(long userId)
+        {
+            var mainUserTracker = _session.Get<UserTracker>(_user.Id);
+            mainUserTracker.Subscriptions.Remove(userId);
+            mainUserTracker.Unsubscribed.Add(userId);
         }
 
         public void Dispose()

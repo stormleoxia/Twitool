@@ -8,10 +8,12 @@ namespace Lx.Web.Twitter.Console.Followers
     internal class FriendFinder : IFriendFinder
     {
         private readonly IFollowerCache _cache;
+        private readonly IConsole _console;
 
-        public FriendFinder(IFollowerCache cache)
+        public FriendFinder(IFollowerCache cache, IConsole console)
         {
             _cache = cache;
+            _console = console;
         }
 
         /// <summary>
@@ -35,7 +37,24 @@ namespace Lx.Web.Twitter.Console.Followers
                 var friendFollowers = _cache.SelectFollowersNotFollowed(user.Id, follower).ToArray();
                 list.AddRange(friendFollowers);
             }
+            _console.WriteLine("Found potential {0} friends", list.Count);
             return list;
         }
+
+        /// <summary>
+        /// Since there were lots of friends added, we need to check which of them returned the favor 
+        /// and subscribe to us.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="maxFriends">The maximum friends.</param>
+        /// <returns></returns>
+        public IEnumerable<long> GetNotFriends(ILoggedUser user, int maxFriends)
+        {
+            _cache.SetUser(user);
+            List<long> list = _cache.SelectSubscriptionsNotFollowing(user.Id).ToList();
+            _console.WriteLine("Found potential {0} unfriends", list.Count);
+            return list;
+        }
+ 
     }
 }
