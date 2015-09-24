@@ -36,6 +36,10 @@ namespace Lx.Web.Twitter.Console.Followers
             {
                 var friendFollowers = _cache.SelectFollowersNotFollowed(user.Id, follower).ToArray();
                 list.AddRange(friendFollowers);
+                if (list.Count > maxFriends)
+                {
+                    break;
+                }
             }
             _console.WriteLine("Found potential {0} friends", list.Count);
             return list.Take(maxFriends);

@@ -7,7 +7,7 @@ namespace Lx.Web.Twitter.Console
     {
         public void ConfigureExceptionHandling()
         {
-            ExceptionHandler.SwallowWebExceptions = true;
+            ExceptionHandler.SwallowWebExceptions = false;
         }
 
         public void ConfigureRateLimiting()
